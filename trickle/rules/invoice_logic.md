@@ -1,0 +1,15 @@
+When processing invoice data
+- Support multi-sheet Excel files.
+- Identify sheet types based on name keywords:
+  - "فروش" -> Sale
+  - "فروش اعتباری" -> Credit Sale
+  - "برگشت از فروش" -> Return
+  - "برگشت از فروش اعتباری" -> Credit Return
+- **Filtering Rule**: Only process rows where "Variety Code" (کد تنوع) starts with "DKPC" (case-insensitive).
+- **Data Grouping**: Group by "Variety Code" (کد تنوع).
+- **New Columns Required**:
+  - **Variety Description** (شرح تنوع): Include this from the source.
+  - **Net Sales Count** = (Sale + Credit Sale) - (Return + Credit Return).
+  - **Total Revenue** (درآمد کل) = Total Creditor (بستانکار) - Total Debtor (بدهکار).
+  - **Revenue per Unit** (درآمد واحد) = Total Revenue / Net Sales Count.
+- Output Excel should include these new breakdown columns.
