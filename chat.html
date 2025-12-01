@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چت هوش مصنوعی | Mojaba</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .chat-box {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 18px 22px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 16px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+        
+        .bot-message {
+            background: white;
+            color: #333;
+            margin-right: auto;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 18px 22px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #7c3aed;
+            border-radius: 50%;
+            animation: typing 1.5s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .input-area {
+            padding: 25px;
+            background: white;
+            border-top: 2px solid #f1f5f9;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 18px 22px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8fafc;
+            color: #333;
+        }
+        
+        #user-input:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+        
+        #send-btn {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 5px 20px rgba(79, 70, 229, 0.4);
+        }
+        
+        #send-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5);
+        }
+        
+        #send-btn:active {
+            transform: translateY(0);
+        }
+        
+        .model-selector {
+            padding: 0 25px 15px;
+            background: white;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .model-btn {
+            padding: 10px 20px;
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .model-btn.active {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border-color: #4f46e5;
+        }
+        
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 0 25px 20px;
+            color: #0369a1;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 95vh;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .chat-box {
+                padding: 15px;
+            }
+            
+            .input-area {
+                padding: 15px;
+            }
+            
+            .message {
+                max-width: 90%;
+                padding: 15px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-right"></i> بازگشت به سایت
+    </a>
+    
+    <div class="chat-container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> دستیار هوش مصنوعی Groq</h1>
+            <p>سوالات خود را به فارسی یا انگلیسی بپرسید</p>
+        </div>
+        
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <span>این چت بات از مدل Mixtral استفاده می‌کند. برای سوالات پیچیده‌تر می‌توانید مدل را تغییر دهید.</span>
+        </div>
+        
+        <div class="model-selector">
+            <div>انتخاب مدل:</div>
+            <div class="model-btn active" data-model="mixtral-8x7b-32768">Mixtral (پیشنهادی)</div>
+            <div class="model-btn" data-model="llama2-70b-4096">Llama 2</div>
+            <div class="model-btn" data-model="gemma-7b-it">Gemma</div>
+        </div>
+        
+        <div class="chat-box" id="chat-box">
+            <!-- پیام‌ها اینجا نمایش داده می‌شوند -->
+            <div class="message bot-message">
+                سلام! 👋 من دستیار هوش مصنوعی شما هستم. چه سوالی دارید؟
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="پیام خود را اینجا بنویسید..." autocomplete="off">
+            <button id="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 🔑 API Key خود را اینجا قرار دهید
+        const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
+        
+        // تنظیمات اولیه
+        let currentModel = 'mixtral-8x7b-32768';
+        const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        
+        // انتخاب مدل
+        document.querySelectorAll('.model-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentModel = this.getAttribute('data-model');
+                addBotMessage(`مدل به ${this.textContent} تغییر کرد.`);
+            });
+        });
+        
+        // ارسال پیام
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // اضافه کردن پیام کاربر
+            addUserMessage(message);
+            input.value = '';
+            
+            // نشانگر تایپ
+            showTypingIndicator();
+            
+            try {
+                const response = await callGroqAPI(message);
+                removeTypingIndicator();
+                addBotMessage(response);
+            } catch (error) {
+                removeTypingIndicator();
+                addBotMessage('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
+                console.error('Error:', error);
+            }
+        }
+        
+        async function callGroqAPI(userMessage) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: currentModel,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'شما یک دستیار فارسی زبان بسیار مفید هستید. به زبان فارسی پاسخ دهید و پاسخ‌های دقیق و مفیدی ارائه دهید.'
+                        },
+                        {
+                            role: 'user',
+                            content: userMessage
+                        }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 1500,
+                    stream: false
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+        
+        // توابع کمکی برای نمایش پیام‌ها
+        function addUserMessage(text) {
+            const chatBox = document.getElementById('chat-box');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.textContent = text;
+            chatBox.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function addBotMessage(text) {
+            const chatBox = document.getElementById('chat-box');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+            chatBox.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function showTypingIndicator() {
+            const chatBox = document.getElementById('chat-box');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatBox.appendChild(typingDiv);
+            scrollToBottom();
+        }
+        
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+        
+        function scrollToBottom() {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        // فوکوس خودکار روی input
+        document.getElementById('user-input').focus();
+    </script>
+</body>
+</html>
